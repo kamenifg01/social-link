@@ -53,7 +53,7 @@ backend/node_modules/
 backend/.env
 backend/dist/
 backend/coverage/
-
+backend/config/
 # Frontend
 frontend/node_modules/
 frontend/.env
@@ -66,7 +66,7 @@ frontend/web-build/
 
 # System Files
 .DS_Store
-Thumbs.db 
+Thumbs.db
 # Build and Release Folders
 bin-debug/
 bin-release/
@@ -81,6 +81,7 @@ bin-release/
 *.air
 *.ipa
 *.apk
+*.json
 
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
