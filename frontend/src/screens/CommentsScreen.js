@@ -13,7 +13,11 @@ import {
   Alert
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+<<<<<<< Updated upstream
 import { useTheme } from '../hooks/useTheme';
+=======
+import { useTheme } from '../contexts/ThemeContext';
+>>>>>>> Stashed changes
 import { useAuth } from '../hooks/useAuth';
 import axios from 'axios';
 import { API_URL } from '../config';
@@ -24,15 +28,35 @@ const CommentsScreen = ({ route, navigation }) => {
   const { postId } = route.params;
   const { theme } = useTheme();
   const { user } = useAuth();
+<<<<<<< Updated upstream
+=======
+  const [post, setPost] = useState(null);
+>>>>>>> Stashed changes
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
+<<<<<<< Updated upstream
     loadComments();
   }, [postId]);
 
+=======
+    loadPost();
+    loadComments();
+  }, [postId]);
+
+  const loadPost = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/posts/${postId}`);
+      setPost(response.data);
+    } catch (error) {
+      Alert.alert('Erreur', 'Impossible de charger le post');
+    }
+  };
+
+>>>>>>> Stashed changes
   const loadComments = async () => {
     try {
       const response = await axios.get(`${API_URL}/posts/${postId}/comments`);
@@ -85,6 +109,53 @@ const CommentsScreen = ({ route, navigation }) => {
     );
   };
 
+<<<<<<< Updated upstream
+=======
+  const renderPost = () => {
+    if (!post) return null;
+
+    const formattedDate = formatDistanceToNow(new Date(post.createdAt), {
+      addSuffix: true,
+      locale: fr
+    });
+
+    return (
+      <View style={[styles.postContainer, { backgroundColor: theme.colors.card }]}>
+        <View style={styles.postHeader}>
+          {post.author?.avatar ? (
+            <Image
+              source={{ uri: post.author.avatar }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View style={[styles.avatarPlaceholder, { backgroundColor: theme.colors.border }]}>
+              <Icon name="user" size={16} color={theme.colors.text} />
+            </View>
+          )}
+          <View style={styles.authorInfo}>
+            <Text style={[styles.authorName, { color: theme.colors.text }]}>
+              {post.author?.username || 'Utilisateur inconnu'}
+            </Text>
+            <Text style={[styles.timestamp, { color: theme.colors.textSecondary }]}>
+              {formattedDate}
+            </Text>
+          </View>
+        </View>
+        <Text style={[styles.postContent, { color: theme.colors.text }]}>
+          {post.content}
+        </Text>
+        {post.mediaUrl && (
+          <Image
+            source={{ uri: post.mediaUrl }}
+            style={styles.postMedia}
+            resizeMode="cover"
+          />
+        )}
+      </View>
+    );
+  };
+
+>>>>>>> Stashed changes
   const renderComment = ({ item }) => {
     const isOwner = item.author?.id === user?.id;
     const formattedDate = formatDistanceToNow(new Date(item.createdAt), {
@@ -148,6 +219,10 @@ const CommentsScreen = ({ route, navigation }) => {
         renderItem={renderComment}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.commentsList}
+<<<<<<< Updated upstream
+=======
+        ListHeaderComponent={renderPost}
+>>>>>>> Stashed changes
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: theme.colors.textSecondary }]}>
@@ -200,6 +275,12 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     marginBottom: 10,
+<<<<<<< Updated upstream
+=======
+    marginLeft: 20,
+    borderLeftWidth: 1,
+    borderLeftColor: 'rgba(0, 0, 0, 0.1)',
+>>>>>>> Stashed changes
   },
   commentHeader: {
     flexDirection: 'row',
@@ -268,6 +349,34 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+<<<<<<< Updated upstream
+=======
+  postContainer: {
+    padding: 15,
+    borderRadius: 12,
+    marginBottom: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  postHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  authorInfo: {
+    flex: 1,
+  },
+  postContent: {
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: 10,
+  },
+  postMedia: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+  },
+>>>>>>> Stashed changes
 });
 
 export default CommentsScreen; 

@@ -1,10 +1,17 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+<<<<<<< Updated upstream
 import { useTheme } from '../hooks/useTheme';
 
 const MessagesScreen = ({ navigation }) => {
   const { theme } = useTheme();
+=======
+import { useTheme } from '../contexts/ThemeContext';
+
+const MessagesScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+>>>>>>> Stashed changes
 
   const messages = [
     {
@@ -37,8 +44,13 @@ const MessagesScreen = ({ navigation }) => {
       style={[
         styles.messageItem,
         { 
+<<<<<<< Updated upstream
           backgroundColor: theme.colors.card,
           borderColor: theme.colors.border
+=======
+          backgroundColor: colors.card,
+          borderColor: colors.border
+>>>>>>> Stashed changes
         }
       ]}
       onPress={() => navigation.navigate('ChatScreen', { user: item.user })}
@@ -46,16 +58,27 @@ const MessagesScreen = ({ navigation }) => {
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
         {item.user.online && (
+<<<<<<< Updated upstream
           <View style={[styles.onlineIndicator, { backgroundColor: theme.colors.success }]} />
+=======
+          <View style={[styles.onlineIndicator, { backgroundColor: colors.success }]} />
+>>>>>>> Stashed changes
         )}
       </View>
 
       <View style={styles.messageContent}>
         <View style={styles.messageHeader}>
+<<<<<<< Updated upstream
           <Text style={[styles.userName, { color: theme.colors.text }]}>
             {item.user.name}
           </Text>
           <Text style={[styles.messageTime, { color: theme.colors.textSecondary }]}>
+=======
+          <Text style={[styles.userName, { color: colors.text }]}>
+            {item.user.name}
+          </Text>
+          <Text style={[styles.messageTime, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
             {item.time}
           </Text>
         </View>
@@ -64,15 +87,24 @@ const MessagesScreen = ({ navigation }) => {
           <Text 
             style={[
               styles.lastMessage,
+<<<<<<< Updated upstream
               { color: theme.colors.textSecondary },
               item.unread > 0 && { color: theme.colors.text, fontWeight: '600' }
+=======
+              { color: colors.textSecondary },
+              item.unread > 0 && { color: colors.text, fontWeight: '600' }
+>>>>>>> Stashed changes
             ]}
             numberOfLines={1}
           >
             {item.lastMessage}
           </Text>
           {item.unread > 0 && (
+<<<<<<< Updated upstream
             <View style={[styles.unreadBadge, { backgroundColor: theme.colors.primary }]}>
+=======
+            <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
+>>>>>>> Stashed changes
               <Text style={styles.unreadCount}>{item.unread}</Text>
             </View>
           )}
@@ -82,7 +114,11 @@ const MessagesScreen = ({ navigation }) => {
   );
 
   return (
+<<<<<<< Updated upstream
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+=======
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+>>>>>>> Stashed changes
       <FlatList
         data={messages}
         renderItem={renderMessage}
@@ -90,7 +126,11 @@ const MessagesScreen = ({ navigation }) => {
         contentContainerStyle={styles.listContainer}
       />
       <TouchableOpacity 
+<<<<<<< Updated upstream
         style={[styles.newMessageButton, { backgroundColor: theme.colors.primary }]}
+=======
+        style={[styles.newMessageButton, { backgroundColor: colors.primary }]}
+>>>>>>> Stashed changes
         onPress={() => navigation.navigate('NewMessage')}
       >
         <Icon name="edit" size={20} color="#fff" />

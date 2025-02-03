@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useCallback, createContext, useContext, useMemo } from "react";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React, { useState, useEffect, useCallback } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { DefaultTheme, DarkTheme } from '@react-navigation/native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
-import { lightTheme, darkTheme } from '../styles/theme';
+import { useTheme } from '../contexts/ThemeContext';
+import PropTypes from 'prop-types';
+import { createStackNavigator } from '@react-navigation/stack';
 
 // Import des écrans
 import LoginScreen from "../screens/LoginScreen";
@@ -25,78 +23,14 @@ import EditProfileScreen from '../screens/EditProfileScreen';
 import OnboardingScreen from '../screens/OnboardingScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import CommentsScreen from '../screens/CommentsScreen';
+import HomeTabs from './TabNavigator';
+import SearchScreen from '../screens/SearchScreen';
 
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
-
-// Contexte pour le thème
-export const ThemeContext = createContext({
-  isDarkMode: false,
-  toggleTheme: () => {},
-});
-
-// Personnalisation des thèmes
-const CustomLightTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    ...lightTheme.colors,
-  },
-};
-
-const CustomDarkTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    ...darkTheme.colors,
-  },
-};
-
-const getTabBarIcon = (routeName, color, size) => {
-  let iconName;
-
-  if (routeName === 'Home') {
-    iconName = 'home';
-  } else if (routeName === 'Network') {
-    iconName = 'users';
-  } else if (routeName === 'Jobs') {
-    iconName = 'briefcase';
-  } else if (routeName === 'Notifications') {
-    iconName = 'bell';
-  } else if (routeName === 'Messages') {
-    iconName = 'envelope';
-  }
-
-  return <Icon name={iconName} size={size} color={color} />;
-};
-
-const HomeTabs = () => {
-  const { isDarkMode } = React.useContext(ThemeContext);
-
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => getTabBarIcon(route.name, color, size),
-        tabBarActiveTintColor: '#0073b1',
-        tabBarInactiveTintColor: 'gray',
-        tabBarStyle: {
-          backgroundColor: isDarkMode ? '#2d2d2d' : '#ffffff',
-          borderTopColor: isDarkMode ? '#404040' : '#e1e1e1',
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Fil d\'actualité', headerShown: false }} />
-      <Tab.Screen name="Network" component={NetworkScreen} options={{ title: 'Réseau', headerShown: false }} />
-      <Tab.Screen name="Jobs" component={JobsScreen} options={{ title: 'Emplois', headerShown: false }} />
-      <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ title: 'Notifications', headerShown: false }} />
-      <Tab.Screen name="Messages" component={MessagesScreen} options={{ title: 'Messages', headerShown: false }} />
-    </Tab.Navigator>
-  );
-};
+const Stack = createStackNavigator();
 
 const DrawerContent = ({ navigation, onLogout }) => {
-  const { isDarkMode } = useContext(ThemeContext);
+  const { colors, isDarkMode } = useTheme();
   const [userName, setUserName] = useState('');
   const [profileViews, setProfileViews] = useState(0);
 
@@ -115,11 +49,6 @@ const DrawerContent = ({ navigation, onLogout }) => {
     } catch (error) {
       console.error('Erreur lors du chargement des données utilisateur:', error);
     }
-  };
-
-  const handleLogout = async () => {
-    await onLogout();
-    navigation.closeDrawer();
   };
 
   const handleProfileNavigation = () => {
@@ -166,7 +95,7 @@ const DrawerContent = ({ navigation, onLogout }) => {
         {renderMenuItem('bookmark', 'Posts enregistrés', () => {})}
         {renderMenuItem('file', 'Pages', () => {})}
         {renderMenuItem('cog', 'Paramètres', handleSettingsNavigation)}
-        {renderMenuItem('sign-out', 'Se déconnecter', handleLogout)}
+        {renderMenuItem('sign-out', 'Se déconnecter', onLogout)}
       </View>
     </View>
   );
@@ -181,8 +110,8 @@ const AppNavigator = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const systemColorScheme = useColorScheme();
+  const [searchQuery, setSearchQuery] = useState('');
+  const { colors, isDarkMode } = useTheme();
   
   const auth = useSelector((state) => state.auth);
 
@@ -204,42 +133,9 @@ const AppNavigator = () => {
 
   useEffect(() => {
     checkAuth();
-    loadThemePreference();
-
     const tokenCheckInterval = setInterval(checkAuth, 1000);
-
-    return () => {
-      clearInterval(tokenCheckInterval);
-    };
+    return () => clearInterval(tokenCheckInterval);
   }, [checkAuth]);
-
-  const loadThemePreference = async () => {
-    try {
-      const savedTheme = await AsyncStorage.getItem('isDarkMode');
-      if (savedTheme !== null) {
-        const isDark = JSON.parse(savedTheme);
-        setIsDarkMode(isDark);
-        if (window.updateAppTheme) {
-          window.updateAppTheme(isDark);
-        }
-      }
-    } catch (error) {
-      console.error('Erreur lors du chargement du thème:', error);
-    }
-  };
-
-  const toggleTheme = async () => {
-    try {
-      const newMode = !isDarkMode;
-      setIsDarkMode(newMode);
-      await AsyncStorage.setItem('isDarkMode', JSON.stringify(newMode));
-      if (window.updateAppTheme) {
-        window.updateAppTheme(newMode);
-      }
-    } catch (error) {
-      console.error('Erreur lors du changement de thème:', error);
-    }
-  };
 
   const handleLogout = useCallback(async () => {
     try {
@@ -255,7 +151,14 @@ const AppNavigator = () => {
     console.log('Filtrage:', !isFiltering);
   };
 
-  const renderHeaderLeft = useCallback((navigation) => (
+  const handleSearch = (text, navigation) => {
+    setSearchQuery(text);
+    if (text.trim() && navigation) {
+      navigation.navigate('Search', { query: text.trim() });
+    }
+  };
+
+  const renderHeaderLeft = useCallback(({ navigation }) => (
     <Icon
       name="user-circle"
       size={25}
@@ -265,124 +168,228 @@ const AppNavigator = () => {
     />
   ), [isDarkMode]);
 
-  const renderHeaderRight = useCallback((navigation) => (
-    <View style={styles.headerRight}>
-      <View style={[styles.searchContainer, isDarkMode && styles.searchContainerDark]}>
-        <Icon name="search" size={15} color={isDarkMode ? '#fff' : '#666'} style={styles.searchIcon} />
-        <TextInput
-          placeholder="Rechercher"
-          placeholderTextColor={isDarkMode ? '#999' : '#666'}
-          style={[styles.searchInput, isDarkMode && styles.searchInputDark]}
-        />
+  const renderHeaderRight = useCallback(({ navigation }) => {
+    // Vérifier si nous sommes dans l'onglet Home
+    const tabState = navigation.getState()?.routes?.[0]?.state;
+    const currentTab = tabState?.routes?.[tabState?.index]?.name;
+    const isHomeTab = !tabState || currentTab === 'Home';
+
+    return (
+      <View style={styles.headerRight}>
+        <View style={[styles.searchContainer, isDarkMode && styles.searchContainerDark]}>
+          <Icon name="search" size={15} color={isDarkMode ? '#fff' : '#666'} style={styles.searchIcon} />
+          <TextInput
+            placeholder="Rechercher"
+            placeholderTextColor={isDarkMode ? '#999' : '#666'}
+            style={[styles.searchInput, isDarkMode && styles.searchInputDark]}
+            value={searchQuery}
+            onChangeText={(text) => handleSearch(text, navigation)}
+            onSubmitEditing={() => {
+              if (searchQuery.trim()) {
+                navigation.navigate('Search', { query: searchQuery.trim() });
+              }
+            }}
+          />
+        </View>
+        {currentTab === 'Jobs' && (
+          <TouchableOpacity onPress={handleFilter} style={{ marginLeft: 10 }}>
+            <Icon 
+              name="sliders" 
+              size={20} 
+              color={isFiltering ? '#0073b1' : (isDarkMode ? '#fff' : '#0073b1')}
+            />
+          </TouchableOpacity>
+        )}
+        {isHomeTab && (
+          <>
+            <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
+              <Icon name="edit" size={20} color={isDarkMode ? '#fff' : '#0073b1'} style={{ marginRight: 15 }} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleFilter}>
+              <Icon 
+                name="filter" 
+                size={20} 
+                color={isFiltering ? '#0073b1' : (isDarkMode ? '#fff' : '#0073b1')} 
+                style={{ marginRight: 15 }} 
+              />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('ScanQR')}>
+              <Icon 
+                name="qrcode" 
+                size={20} 
+                color={isDarkMode ? '#fff' : '#0073b1'} 
+                style={{ marginRight: 15 }} 
+              />
+            </TouchableOpacity>
+          </>
+        )}
       </View>
-      <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
-        <Icon name="edit" size={20} color={isDarkMode ? '#fff' : '#0073b1'} style={{ marginRight: 15 }} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handleFilter}>
-        <Icon 
-          name="filter" 
-          size={20} 
-          color={isFiltering ? '#0073b1' : (isDarkMode ? '#fff' : '#0073b1')} 
-          style={{ marginRight: 15 }} 
-        />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={toggleTheme}>
-        <Icon 
-          name={isDarkMode ? 'sun-o' : 'moon-o'} 
-          size={20} 
-          color={isDarkMode ? '#fff' : '#0073b1'} 
-          style={{ marginRight: 15 }} 
-        />
-      </TouchableOpacity>
-    </View>
-  ), [isFiltering, isDarkMode, toggleTheme]);
+    );
+  }, [isFiltering, isDarkMode, searchQuery]);
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
-      <Drawer.Navigator
-        drawerContent={(props) => (
-          <DrawerContent {...props} onLogout={handleLogout} />
-        )}
-        screenOptions={{
+    <Drawer.Navigator
+      drawerContent={(props) => (
+        <DrawerContent {...props} onLogout={handleLogout} />
+      )}
+      screenOptions={({ navigation, route }) => {
+        // Vérifier si nous sommes dans l'onglet Home du TabNavigator
+        const tabState = route.state?.routes?.[0]?.state;
+        const currentTab = tabState?.routes?.[tabState?.index]?.name;
+        const isHomeTab = route.name === 'HomeTabs' && (!tabState || currentTab === 'Home');
+
+        return {
           headerShown: true,
           swipeEnabled: isAuthenticated && hasCompletedOnboarding,
           headerStyle: {
-            backgroundColor: isDarkMode ? darkTheme.colors.background : lightTheme.colors.background,
+            backgroundColor: isDarkMode ? colors.background : colors.background,
+            elevation: 0,
+            shadowOpacity: 0,
           },
-          headerTintColor: isDarkMode ? darkTheme.colors.text : lightTheme.colors.text,
-        }}
-      >
-        {isAuthenticated ? (
-          hasCompletedOnboarding ? (
-            <>
-              <Drawer.Screen
-                name="HomeTabs"
-                component={HomeTabs}
-                options={({ navigation }) => ({
-                  headerTitle: '',
-                  headerLeft: () => renderHeaderLeft(navigation),
-                  headerRight: () => renderHeaderRight(navigation),
-                })}
-              />
-              <Drawer.Screen name="Profile" component={ProfileScreen} />
-              <Drawer.Screen name="EditProfile" 
-                component={EditProfileScreen}
-                options={{
-                  title: 'Modifier le profil',
-                  headerTitleAlign: 'center',
-                }}
-              />
-              <Drawer.Screen name="Settings"
-                component={SettingsScreen}
-                options={{
-                  title: 'Paramètres',
-                  headerTitleAlign: 'center',
-                }}
-              />
-              <Drawer.Screen name="PostDetails" component={PostDetailsScreen} />
-              <Drawer.Screen name="CreatePost" component={CreatePostScreen} />
-              <Drawer.Screen name="Messages" component={MessagesScreen} />
-              <Drawer.Screen 
-                name="Comments" 
-                component={CommentsScreen}
-                options={{
-                  title: 'Commentaires',
-                  headerTitleAlign: 'center',
-                }}
-              />
-            </>
-          ) : (
-            <Drawer.Screen 
-              name="Onboarding" 
-              component={OnboardingScreen}
-              options={{
-                headerShown: false,
-                swipeEnabled: false
-              }}
-            />
-          )
-        ) : (
+          headerTintColor: isDarkMode ? colors.text : colors.text,
+          drawerStyle: {
+            backgroundColor: isDarkMode ? colors.card : colors.card,
+          },
+          headerLeft: isHomeTab ? 
+            () => renderHeaderLeft({ navigation }) : 
+            () => (
+              <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginLeft: 15 }}>
+                <Icon name="arrow-left" size={24} color={isDarkMode ? '#fff' : '#0073b1'} />
+              </TouchableOpacity>
+            ),
+          headerRight: isHomeTab ? () => renderHeaderRight({ navigation }) : undefined,
+        };
+      }}
+    >
+      {isAuthenticated ? (
+        hasCompletedOnboarding ? (
           <>
-            <Drawer.Screen 
-              name="Login" 
-              component={LoginScreen}
+            <Drawer.Screen
+              name="HomeTabs"
+              component={HomeTabs}
               options={{
-                headerShown: false,
-                swipeEnabled: false
+                headerTitle: '',
               }}
             />
             <Drawer.Screen 
-              name="SignUp" 
-              component={SignUpScreen}
+              name="Profile"
+              component={ProfileScreen}
               options={{
-                headerShown: false,
-                swipeEnabled: false
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Settings"
+              component={SettingsScreen}
+              options={{
+                headerTitle: 'Paramètres',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Comments"
+              component={CommentsScreen}
+              options={{
+                headerTitle: 'Commentaires',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Search"
+              component={SearchScreen}
+              options={{
+                headerTitle: 'Recherche',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="CreatePost"
+              component={CreatePostScreen}
+              options={{
+                headerTitle: 'Créer un post',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="PostDetails"
+              component={PostDetailsScreen}
+              options={{
+                headerTitle: 'Détails du post',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="EditProfile"
+              component={EditProfileScreen}
+              options={{
+                headerTitle: 'Modifier le profil',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Messages"
+              component={MessagesScreen}
+              options={{
+                headerTitle: 'Messages',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Network"
+              component={NetworkScreen}
+              options={{
+                headerTitle: 'Réseau',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Notifications"
+              component={NotificationsScreen}
+              options={{
+                headerTitle: 'Notifications',
+                headerTitleAlign: 'center',
+              }}
+            />
+            <Drawer.Screen 
+              name="Jobs"
+              component={JobsScreen}
+              options={{
+                headerTitle: 'Emplois',
+                headerTitleAlign: 'center',
               }}
             />
           </>
-        )}
-      </Drawer.Navigator>
-    </ThemeContext.Provider>
+        ) : (
+          <Drawer.Screen 
+            name="Onboarding" 
+            component={OnboardingScreen}
+            options={{
+              headerShown: false,
+              swipeEnabled: false
+            }}
+          />
+        )
+      ) : (
+        <>
+          <Drawer.Screen 
+            name="Login" 
+            component={LoginScreen}
+            options={{
+              headerShown: false,
+              swipeEnabled: false
+            }}
+          />
+          <Drawer.Screen 
+            name="SignUp" 
+            component={SignUpScreen}
+            options={{
+              headerShown: false,
+              swipeEnabled: false
+            }}
+          />
+        </>
+      )}
+    </Drawer.Navigator>
   );
 };
 
@@ -390,28 +397,31 @@ const styles = StyleSheet.create({
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingRight: 15,
     flex: 1,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 4,
+    paddingHorizontal: 10,
+    height: 36,
+    flex: 1,
     marginRight: 10,
-    height: 35,
-    width: 200,
   },
   searchContainerDark: {
-    backgroundColor: '#444',
+    backgroundColor: '#404040',
   },
   searchIcon: {
-    marginLeft: 10,
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    paddingHorizontal: 5,
-    color: '#333',
+    fontSize: 14,
+    color: '#666',
+    height: '100%',
+    padding: 0,
   },
   searchInputDark: {
     color: '#fff',

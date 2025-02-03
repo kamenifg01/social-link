@@ -10,6 +10,12 @@ router.use(authMiddleware);
 router.get("/profile", userController.getProfile);
 router.put("/profile", userController.updateProfile);
 
+<<<<<<< Updated upstream
+=======
+// Route de recherche d'utilisateurs
+router.get("/search", userController.searchUsers);
+
+>>>>>>> Stashed changes
 // Route de suppression de compte
 router.delete("/account", userController.deleteAccount);
 

@@ -1,8 +1,14 @@
+<<<<<<< Updated upstream
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Utilisez l'adresse IP de votre machine sur le réseau local
 const API_URL = "https://e50c-46-193-56-215.ngrok-free.app/api";  // Remplacez X par le dernier numéro de votre IP
+=======
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiClient from '../api/axiosConfig';
+import { API_URL } from '../config/api';
+>>>>>>> Stashed changes
 
 // Fonction pour récupérer le token
 const getAuthToken = async () => {
@@ -23,11 +29,19 @@ const getAuthToken = async () => {
 const refreshAuthToken = async () => {
   try {
     const currentToken = await getAuthToken();
+<<<<<<< Updated upstream
     const response = await axios.post(`${API_URL}/auth/refresh`, {
       token: currentToken,
     });
     const newToken = response.data.token;
     await AsyncStorage.setItem('token', newToken);
+=======
+    const response = await apiClient.post('/auth/refresh', {
+      token: currentToken,
+    });
+    const newToken = response.data.token;
+    await AsyncStorage.setItem('userToken', newToken);
+>>>>>>> Stashed changes
     return newToken;
   } catch (error) {
     throw error;
@@ -36,6 +50,7 @@ const refreshAuthToken = async () => {
 
 // Authentification
 export const login = async (email, password) => {
+<<<<<<< Updated upstream
   const response = await axios.post(`${API_URL}/auth/login`, { email, password });
   return response.data;
 };
@@ -43,6 +58,38 @@ export const login = async (email, password) => {
 export const signUp = async (email, password) => {
   const response = await axios.post(`${API_URL}/auth/signup`, { email, password });
   return response.data;
+=======
+  try {
+    console.log('Tentative de connexion avec:', { email });
+    const response = await apiClient.post('/auth/login', { email, password });
+    console.log('Réponse login:', response.data);
+    
+    if (response.data.token && response.data.user) {
+      await AsyncStorage.multiSet([
+        ['userToken', response.data.token],
+        ['user', JSON.stringify(response.data.user)]
+      ]);
+      
+      // Configurer le token pour les futures requêtes
+      apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+    }
+    
+    return response.data;
+  } catch (error) {
+    console.error('Erreur login:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const signUp = async (email, password) => {
+  try {
+    const response = await apiClient.post('/auth/signup', { email, password });
+    return response.data;
+  } catch (error) {
+    console.error('Erreur signup:', error.response?.data || error.message);
+    throw error;
+  }
+>>>>>>> Stashed changes
 };
 
 // Posts
@@ -51,13 +98,18 @@ export const fetchPosts = async () => {
     const token = await getAuthToken();
     console.log('Appel API feed - URL:', `${API_URL}/posts/feed`);
     
+<<<<<<< Updated upstream
     const response = await axios.get(`${API_URL}/posts/feed`, {
+=======
+    const response = await apiClient.get('/posts/feed', {
+>>>>>>> Stashed changes
       headers: { 
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
     });
     
+<<<<<<< Updated upstream
     return response.data;
   } catch (error) {
     if (error.message === 'No token found') {
@@ -68,10 +120,39 @@ export const fetchPosts = async () => {
       status: error.response?.status,
       data: error.response?.data
     });
+=======
+    // Récupérer les réactions pour chaque post en une seule fois
+    const postsWithReactions = await Promise.all(
+      response.data.map(async (post) => {
+        const reactionsResponse = await apiClient.get(`/posts/${post.id}/reactions`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Calculer le nombre total de réactions
+        const totalReactions = Object.values(reactionsResponse.data.reactions)
+          .reduce((sum, users) => sum + users.length, 0);
+        
+        return {
+          ...post,
+          reactions: reactionsResponse.data.reactions,
+          currentUserReaction: reactionsResponse.data.currentUserReaction,
+          totalReactions
+        };
+      })
+    );
+    
+    return postsWithReactions;
+  } catch (error) {
+    if (error.message === 'No token found') {
+      return [];
+    }
+    console.error('Erreur détaillée du feed:', error);
+>>>>>>> Stashed changes
     throw error;
   }
 };
 
+<<<<<<< Updated upstream
 export const createPost = async (postData) => {
   try {
     const token = await getAuthToken();
@@ -101,13 +182,31 @@ export const createPost = async (postData) => {
       response: error.response?.data,
       status: error.response?.status,
     });
+=======
+export const createPost = async (formData) => {
+  try {
+    const token = await getAuthToken();
+    const response = await apiClient.post('/posts', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+>>>>>>> Stashed changes
     throw error;
   }
 };
 
 export const updatePost = async (postId, updatedData) => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.put(`${API_URL}/posts/${postId}`, updatedData, {
+=======
+  const response = await apiClient.put(`/posts/${postId}`, updatedData, {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -115,7 +214,11 @@ export const updatePost = async (postId, updatedData) => {
 
 export const deletePost = async (postId) => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.delete(`${API_URL}/posts/${postId}`, {
+=======
+  const response = await apiClient.delete(`/posts/${postId}`, {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -125,7 +228,11 @@ export const deletePost = async (postId) => {
 export const fetchProfile = async () => {
   try {
     const token = await getAuthToken();
+<<<<<<< Updated upstream
     const response = await axios.get(`${API_URL}/user/profile`, {
+=======
+    const response = await apiClient.get('/user/profile', {
+>>>>>>> Stashed changes
       headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
@@ -155,7 +262,11 @@ export const updateProfile = async (profileData) => {
     console.log('Données envoyées:', profileData);
     console.log('Token:', token);
     
+<<<<<<< Updated upstream
     const response = await axios.put(`${API_URL}/user/profile`, profileData, {
+=======
+    const response = await apiClient.put('/user/profile', profileData, {
+>>>>>>> Stashed changes
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -180,6 +291,7 @@ export const updateProfile = async (profileData) => {
 };
 
 // Comments
+<<<<<<< Updated upstream
 export const createComment = async (postId, commentData) => {
   try {
     const token = await getAuthToken();
@@ -190,6 +302,21 @@ export const createComment = async (postId, commentData) => {
         'Accept': 'application/json'
       },
     });
+=======
+export const createComment = async (postId, content) => {
+  try {
+    const token = await getAuthToken();
+    const response = await apiClient.post(
+      `/posts/${postId}/comments`,
+      { content },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+>>>>>>> Stashed changes
     return response.data;
   } catch (error) {
     console.error('Erreur création commentaire:', error);
@@ -200,6 +327,7 @@ export const createComment = async (postId, commentData) => {
 export const fetchComments = async (postId) => {
   try {
     const token = await getAuthToken();
+<<<<<<< Updated upstream
     console.log('Fetching comments for post:', postId);
     
     const response = await axios.get(`${API_URL}/posts/${postId}/comments`, {
@@ -219,6 +347,20 @@ export const fetchComments = async (postId) => {
       status: error.response?.status,
       data: error.response?.data
     });
+=======
+    const response = await apiClient.get(
+      `/posts/${postId}/comments`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Erreur chargement commentaires:', error);
+>>>>>>> Stashed changes
     return [];
   }
 };
@@ -226,7 +368,11 @@ export const fetchComments = async (postId) => {
 // Notifications
 export const fetchNotifications = async () => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.get(`${API_URL}/notifications`, {
+=======
+  const response = await apiClient.get('/notifications', {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -234,17 +380,55 @@ export const fetchNotifications = async () => {
 
 // User Posts
 export const fetchUserPosts = async (userId) => {
+<<<<<<< Updated upstream
   const token = await getAuthToken();
   const response = await axios.get(`${API_URL}/posts/user/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
+=======
+  try {
+    const token = await getAuthToken();
+    const response = await apiClient.get(`/posts/user/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    
+    // Récupérer les réactions pour chaque post en une seule fois
+    const postsWithReactions = await Promise.all(
+      response.data.map(async (post) => {
+        const reactionsResponse = await apiClient.get(`/posts/${post.id}/reactions`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Calculer le nombre total de réactions
+        const totalReactions = Object.values(reactionsResponse.data.reactions)
+          .reduce((sum, users) => sum + users.length, 0);
+        
+        return {
+          ...post,
+          reactions: reactionsResponse.data.reactions,
+          currentUserReaction: reactionsResponse.data.currentUserReaction,
+          totalReactions
+        };
+      })
+    );
+    
+    return postsWithReactions;
+  } catch (error) {
+    console.error('Erreur récupération posts utilisateur:', error);
+    throw error;
+  }
+>>>>>>> Stashed changes
 };
 
 // Suppression de compte
 export const deleteAccount = async () => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.delete(`${API_URL}/user/account`, {
+=======
+  const response = await apiClient.delete('/user/account', {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -253,7 +437,11 @@ export const deleteAccount = async () => {
 // Relations
 export const fetchSuggestedConnections = async () => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.get(`${API_URL}/connections/suggestions`, {
+=======
+  const response = await apiClient.get('/connections/suggestions', {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -261,7 +449,11 @@ export const fetchSuggestedConnections = async () => {
 
 export const sendConnectionRequest = async (userId) => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.post(`${API_URL}/connections/request`, 
+=======
+  const response = await apiClient.post('/connections/request', 
+>>>>>>> Stashed changes
     { userId },
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -270,7 +462,11 @@ export const sendConnectionRequest = async (userId) => {
 
 export const acceptConnectionRequest = async (requestId) => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.post(`${API_URL}/connections/accept/${requestId}`, {}, {
+=======
+  const response = await apiClient.post(`/connections/accept/${requestId}`, {}, {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -278,7 +474,11 @@ export const acceptConnectionRequest = async (requestId) => {
 
 export const rejectConnectionRequest = async (requestId) => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.post(`${API_URL}/connections/reject/${requestId}`, {}, {
+=======
+  const response = await apiClient.post(`/connections/reject/${requestId}`, {}, {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -286,7 +486,11 @@ export const rejectConnectionRequest = async (requestId) => {
 
 export const fetchUserConnections = async (userId) => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.get(`${API_URL}/connections/user/${userId}`, {
+=======
+  const response = await apiClient.get(`/connections/user/${userId}`, {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
@@ -294,12 +498,17 @@ export const fetchUserConnections = async (userId) => {
 
 export const fetchPendingRequests = async () => {
   const token = await getAuthToken();
+<<<<<<< Updated upstream
   const response = await axios.get(`${API_URL}/connections/pending`, {
+=======
+  const response = await apiClient.get('/connections/pending', {
+>>>>>>> Stashed changes
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
+<<<<<<< Updated upstream
 // Likes
 export const likePost = async (postId) => {
   try {
@@ -340,11 +549,20 @@ export const unlikePost = async (postId) => {
       method: 'delete',
       url: `${API_URL}/posts/${postId}/like`,
       headers: { 
+=======
+// Likes et Réactions
+export const getPostReactions = async (postId) => {
+  try {
+    const token = await getAuthToken();
+    const response = await apiClient.get(`/posts/${postId}/reactions`, {
+      headers: {
+>>>>>>> Stashed changes
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     });
 
+<<<<<<< Updated upstream
     console.log('Unlike réussi:', response.data);
     return response.data;
   } catch (error) {
@@ -354,10 +572,95 @@ export const unlikePost = async (postId) => {
       data: error.response?.data,
       url: `${API_URL}/posts/${postId}/like`
     });
+=======
+    if (response.data) {
+      const { reactions = {}, currentUserReaction = null } = response.data;
+      // Calculer le nombre total de réactions
+      const totalReactions = Object.values(reactions)
+        .reduce((sum, users) => sum + (Array.isArray(users) ? users.length : 0), 0);
+      
+      console.log(`Réactions pour le post ${postId}:`, {
+        reactions,
+        currentUserReaction,
+        totalReactions
+      });
+      
+      return {
+        reactions,
+        currentUserReaction,
+        totalReactions
+      };
+    }
+
+    return {
+      reactions: {},
+      currentUserReaction: null,
+      totalReactions: 0
+    };
+  } catch (error) {
+    console.error('Erreur récupération réactions:', error);
+    return {
+      reactions: {},
+      currentUserReaction: null,
+      totalReactions: 0
+    };
+  }
+};
+
+export const toggleReaction = async (postId, reactionType = 'like') => {
+  try {
+    const token = await getAuthToken();
+    
+    // Récupérer l'état actuel des réactions
+    const currentState = await getPostReactions(postId);
+    const hasReaction = currentState.currentUserReaction === reactionType;
+    
+    console.log('État actuel:', {
+      postId,
+      reactionType,
+      hasReaction,
+      currentState
+    });
+
+    // Utiliser l'endpoint /reactions avec l'action appropriée
+    const response = await apiClient.post(
+      `/posts/${postId}/reactions`,
+      { 
+        reactionType,
+        action: hasReaction ? 'remove' : 'add'
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    if (response.data) {
+      // Mettre à jour le cache local avec les nouvelles données
+      const updatedState = {
+        ...currentState,
+        currentUserReaction: hasReaction ? null : reactionType,
+        totalReactions: hasReaction 
+          ? Math.max(0, currentState.totalReactions - 1)
+          : currentState.totalReactions + 1,
+        reactions: response.data.reactions || currentState.reactions
+      };
+
+      console.log('État mis à jour:', updatedState);
+      return updatedState;
+    }
+
+    return currentState;
+  } catch (error) {
+    console.error('Erreur toggle réaction:', error);
+>>>>>>> Stashed changes
     throw error;
   }
 };
 
+<<<<<<< Updated upstream
 // Reposts
 export const repostPost = async (postId) => {
   const token = await getAuthToken();
@@ -392,3 +695,17 @@ export const reportPost = async (postId, reason) => {
   });
   return response.data;
 }; 
+=======
+// Fonctions simplifiées pour la compatibilité
+export const likePost = (postId) => toggleReaction(postId, 'like');
+export const unlikePost = (postId) => toggleReaction(postId, 'like');
+
+// Reposts
+export const repostPost = async (postId) => {
+  const token = await getAuthToken();
+  const response = await apiClient.post(`/posts/${postId}/repost`, {}, {
+    headers: { Authorization: `Bearer ${token}` } }
+  );
+  return response.data;
+};
+>>>>>>> Stashed changes

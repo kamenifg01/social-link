@@ -1,10 +1,17 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+<<<<<<< Updated upstream
 import { useTheme } from '../hooks/useTheme';
 
 const JobsScreen = ({ navigation }) => {
   const { theme } = useTheme();
+=======
+import { useTheme } from '../contexts/ThemeContext';
+
+const JobsScreen = ({ navigation }) => {
+  const { colors } = useTheme();
+>>>>>>> Stashed changes
 
   const jobs = [
     {
@@ -33,13 +40,19 @@ const JobsScreen = ({ navigation }) => {
       style={[
         styles.jobCard,
         { 
+<<<<<<< Updated upstream
           backgroundColor: theme.colors.card,
           borderColor: theme.colors.border
+=======
+          backgroundColor: colors.card,
+          borderColor: colors.border
+>>>>>>> Stashed changes
         }
       ]}
       onPress={() => navigation.navigate('JobDetails', { job: item })}
     >
       <View style={styles.jobHeader}>
+<<<<<<< Updated upstream
         <Text style={[styles.jobTitle, { color: theme.colors.text }]}>
           {item.title}
         </Text>
@@ -47,39 +60,68 @@ const JobsScreen = ({ navigation }) => {
       </View>
 
       <Text style={[styles.companyName, { color: theme.colors.textSecondary }]}>
+=======
+        <Text style={[styles.jobTitle, { color: colors.text }]}>
+          {item.title}
+        </Text>
+        <Icon name="bookmark-o" size={20} color={colors.primary} />
+      </View>
+
+      <Text style={[styles.companyName, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
         {item.company}
       </Text>
 
       <View style={styles.jobInfo}>
         <View style={styles.infoItem}>
+<<<<<<< Updated upstream
           <Icon name="map-marker" size={14} color={theme.colors.primary} />
           <Text style={[styles.infoText, { color: theme.colors.textSecondary }]}>
+=======
+          <Icon name="map-marker" size={14} color={colors.primary} />
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
             {item.location}
           </Text>
         </View>
 
         <View style={styles.infoItem}>
+<<<<<<< Updated upstream
           <Icon name="briefcase" size={14} color={theme.colors.primary} />
           <Text style={[styles.infoText, { color: theme.colors.textSecondary }]}>
+=======
+          <Icon name="briefcase" size={14} color={colors.primary} />
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
             {item.type}
           </Text>
         </View>
 
         <View style={styles.infoItem}>
+<<<<<<< Updated upstream
           <Icon name="money" size={14} color={theme.colors.primary} />
           <Text style={[styles.infoText, { color: theme.colors.textSecondary }]}>
+=======
+          <Icon name="money" size={14} color={colors.primary} />
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
             {item.salary}
           </Text>
         </View>
       </View>
 
+<<<<<<< Updated upstream
       <Text style={[styles.postedTime, { color: theme.colors.textSecondary }]}>
+=======
+      <Text style={[styles.postedTime, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
         {item.posted}
       </Text>
     </TouchableOpacity>
   );
 
   return (
+<<<<<<< Updated upstream
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={[styles.searchContainer, { backgroundColor: theme.colors.card }]}>
         <View style={[styles.searchBox, { backgroundColor: theme.colors.inputBackground }]}>
@@ -95,6 +137,9 @@ const JobsScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
+=======
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+>>>>>>> Stashed changes
       <FlatList
         data={jobs}
         renderItem={renderJob}
@@ -109,6 +154,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+<<<<<<< Updated upstream
   searchContainer: {
     flexDirection: 'row',
     padding: 16,
@@ -139,6 +185,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+=======
+>>>>>>> Stashed changes
   listContainer: {
     padding: 16,
   },

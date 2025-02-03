@@ -11,12 +11,21 @@ import {
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { deleteAccount } from '../services/apiService';
+<<<<<<< Updated upstream
 import { useTheme } from '../hooks/useTheme';
 
 const SettingsScreen = ({ navigation }) => {
   const { theme, isDarkMode, toggleTheme } = useTheme();
 
   const handleDeleteAccount = () => {
+=======
+import { useTheme } from '../contexts/ThemeContext';
+
+const SettingsScreen = ({ navigation }) => {
+  const { colors, isDarkMode, toggleTheme } = useTheme();
+
+  const handleDeleteAccount = async () => {
+>>>>>>> Stashed changes
     Alert.alert(
       'Supprimer le compte',
       'Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.',
@@ -52,8 +61,13 @@ const SettingsScreen = ({ navigation }) => {
       style={[
         styles.settingItem,
         { 
+<<<<<<< Updated upstream
           backgroundColor: theme.colors.card,
           borderBottomColor: theme.colors.border,
+=======
+          backgroundColor: colors.card,
+          borderBottomColor: colors.border,
+>>>>>>> Stashed changes
         }
       ]}
       onPress={onPress}
@@ -64,12 +78,20 @@ const SettingsScreen = ({ navigation }) => {
           <Icon 
             name={icon} 
             size={20} 
+<<<<<<< Updated upstream
             color={isDestructive ? theme.colors.error : theme.colors.primary} 
+=======
+            color={isDestructive ? colors.error : colors.primary} 
+>>>>>>> Stashed changes
             style={styles.settingIcon} 
           />
           <Text style={[
             styles.settingText,
+<<<<<<< Updated upstream
             { color: isDestructive ? theme.colors.error : theme.colors.text },
+=======
+            { color: isDestructive ? colors.error : colors.text },
+>>>>>>> Stashed changes
           ]}>
             {title}
           </Text>
@@ -78,15 +100,25 @@ const SettingsScreen = ({ navigation }) => {
           <Switch
             value={switchValue}
             onValueChange={onPress}
+<<<<<<< Updated upstream
             trackColor={{ false: theme.colors.border, true: theme.colors.primary }}
             thumbColor={switchValue ? theme.colors.primary : theme.colors.card}
             ios_backgroundColor={theme.colors.border}
+=======
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={switchValue ? colors.primary : colors.card}
+            ios_backgroundColor={colors.border}
+>>>>>>> Stashed changes
           />
         ) : (
           <Icon 
             name="chevron-right" 
             size={16} 
+<<<<<<< Updated upstream
             color={isDestructive ? theme.colors.error : theme.colors.textSecondary} 
+=======
+            color={isDestructive ? colors.error : colors.text} 
+>>>>>>> Stashed changes
           />
         )}
       </View>
@@ -95,18 +127,30 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <ScrollView 
+<<<<<<< Updated upstream
       style={[styles.container, { backgroundColor: theme.colors.background }]}
       contentContainerStyle={styles.contentContainer}
     >
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+=======
+      style={[styles.container, { backgroundColor: colors.background }]}
+      contentContainerStyle={styles.contentContainer}
+    >
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+>>>>>>> Stashed changes
           Apparence
         </Text>
         {renderSettingItem('adjust', 'Mode sombre', toggleTheme, false, true, isDarkMode)}
       </View>
 
       <View style={styles.section}>
+<<<<<<< Updated upstream
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+=======
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+>>>>>>> Stashed changes
           Compte
         </Text>
         {renderSettingItem('lock', 'Confidentialité', () => {})}
@@ -115,7 +159,11 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.section}>
+<<<<<<< Updated upstream
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+=======
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+>>>>>>> Stashed changes
           Aide
         </Text>
         {renderSettingItem('question-circle', 'Centre d\'aide', () => {})}
@@ -123,13 +171,21 @@ const SettingsScreen = ({ navigation }) => {
       </View>
 
       <View style={styles.section}>
+<<<<<<< Updated upstream
         <Text style={[styles.sectionTitle, { color: theme.colors.text }]}>
+=======
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+>>>>>>> Stashed changes
           Danger
         </Text>
         {renderSettingItem('trash', 'Supprimer le compte', handleDeleteAccount, true)}
       </View>
 
+<<<<<<< Updated upstream
       <Text style={[styles.version, { color: theme.colors.textSecondary }]}>
+=======
+      <Text style={[styles.version, { color: colors.text }]}>
+>>>>>>> Stashed changes
         Version 1.0.0
       </Text>
     </ScrollView>

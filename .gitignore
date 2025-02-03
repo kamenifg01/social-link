@@ -54,11 +54,16 @@ backend/.env
 backend/dist/
 backend/coverage/
 backend/config/
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 # Frontend
 frontend/node_modules/
 frontend/.env
 frontend/build/
 frontend/.expo/
+
 frontend/web-build/
 
 # Debug

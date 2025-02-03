@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import React, { useState, useContext } from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> Stashed changes
 import {
   View,
   Text,
@@ -18,14 +22,22 @@ import * as VideoThumbnails from 'expo-video-thumbnails';
 import * as DocumentPicker from 'expo-document-picker';
 import { Video } from 'expo-av';
 import { createPost } from '../services/apiService';
+<<<<<<< Updated upstream
 import { ThemeContext } from '../navigation/AppNavigator';
 import { useTheme } from '@react-navigation/native';
+=======
+import { useTheme } from '../contexts/ThemeContext';
+>>>>>>> Stashed changes
 
 const CreatePostScreen = ({ navigation }) => {
   const [content, setContent] = useState('');
   const [mediaFiles, setMediaFiles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+<<<<<<< Updated upstream
   const { isDarkMode } = useContext(ThemeContext);
+=======
+  const { isDarkMode } = useTheme();
+>>>>>>> Stashed changes
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const { colors } = useTheme();
 
@@ -151,23 +163,54 @@ const CreatePostScreen = ({ navigation }) => {
   const handlePickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
+<<<<<<< Updated upstream
         type: '*/*',
         copyToCacheDirectory: true,
       });
 
       if (result.type === 'success') {
+=======
+        type: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'text/plain'
+        ],
+        copyToCacheDirectory: true
+      });
+
+      if (result.type === 'success') {
+        const fileExtension = result.uri.split('.').pop();
+        const mimeType = {
+          'pdf': 'application/pdf',
+          'doc': 'application/msword',
+          'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'txt': 'text/plain'
+        }[fileExtension] || 'application/octet-stream';
+
+>>>>>>> Stashed changes
         const newFile = {
           uri: result.uri,
           type: 'document',
           name: result.name,
+<<<<<<< Updated upstream
           size: result.size,
           mimeType: result.mimeType,
         };
+=======
+          mimeType: mimeType
+        };
+
+>>>>>>> Stashed changes
         setMediaFiles(prev => [...prev, newFile]);
       }
     } catch (error) {
       console.error('Erreur lors de la sélection du document:', error);
+<<<<<<< Updated upstream
       Alert.alert('Erreur', 'Impossible de sélectionner le document');
+=======
+      Alert.alert('Erreur', 'Impossible de charger le document. Veuillez réessayer.');
+>>>>>>> Stashed changes
     }
   };
 
@@ -176,6 +219,7 @@ const CreatePostScreen = ({ navigation }) => {
   };
 
   const handlePost = async () => {
+<<<<<<< Updated upstream
     if (!content.trim() && mediaFiles.length === 0) {
       Alert.alert('Erreur', 'Veuillez ajouter du contenu ou des médias à votre publication');
       return;
@@ -206,6 +250,40 @@ const CreatePostScreen = ({ navigation }) => {
       Alert.alert(
         'Erreur',
         error.response?.data?.message || 'Impossible de publier le post. Veuillez réessayer plus tard.'
+=======
+    try {
+      if (!content.trim() && mediaFiles.length === 0) {
+        Alert.alert('Erreur', 'Veuillez ajouter du texte ou un média à votre publication');
+        return;
+      }
+
+      setIsLoading(true);
+
+      const formData = new FormData();
+      formData.append('content', content);
+
+      if (mediaFiles.length > 0) {
+        const file = mediaFiles[0];
+        formData.append('media', {
+          uri: Platform.OS === 'ios' ? file.uri.replace('file://', '') : file.uri,
+          type: file.mimeType,
+          name: file.name
+        });
+      }
+
+      const response = await createPost(formData);
+      
+      if (response) {
+        setContent('');
+        setMediaFiles([]);
+        navigation.goBack();
+      }
+    } catch (error) {
+      console.error('Erreur lors de la publication:', error);
+      Alert.alert(
+        'Erreur',
+        'Impossible de publier votre message. Veuillez réessayer.'
+>>>>>>> Stashed changes
       );
     } finally {
       setIsLoading(false);

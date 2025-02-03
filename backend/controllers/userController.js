@@ -1,5 +1,9 @@
 const { User } = require('../models');
 const userService = require('../services/userService');
+<<<<<<< Updated upstream
+=======
+const { Op } = require('sequelize');
+>>>>>>> Stashed changes
 
 exports.signup = async (req, res) => {
   try {
@@ -107,4 +111,26 @@ exports.deleteAccount = async (req, res) => {
     console.error('Erreur lors de la suppression du compte:', error);
     res.status(500).json({ message: "Erreur serveur" });
   }
+<<<<<<< Updated upstream
+=======
+};
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const query = req.query.q || '';
+    const users = await User.findAll({
+      where: {
+        [Op.or]: [
+          { username: { [Op.iLike]: `%${query}%` } },
+          { email: { [Op.iLike]: `%${query}%` } }
+        ]
+      },
+      attributes: ['id', 'username', 'email', 'title', 'company', 'location', 'bio', 'profilePicture']
+    });
+    res.json(users);
+  } catch (error) {
+    console.error('Erreur recherche utilisateurs:', error);
+    res.status(500).json({ message: "Erreur lors de la recherche d'utilisateurs" });
+  }
+>>>>>>> Stashed changes
 }; 

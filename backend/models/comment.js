@@ -8,7 +8,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: false
     },
+<<<<<<< Updated upstream
     likesCount: {
+=======
+    reactions: {
+      type: DataTypes.JSONB,
+      defaultValue: {
+        like: [],    // 👍
+        heart: [],   // ❤️
+        laugh: [],   // 😄
+        wow: [],     // 😮
+        sad: [],     // 😢
+        angry: []    // 😠
+      }
+    },
+    reactionsCount: {
+>>>>>>> Stashed changes
       type: DataTypes.INTEGER,
       defaultValue: 0
     },

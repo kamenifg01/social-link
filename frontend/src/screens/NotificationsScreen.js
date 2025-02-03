@@ -1,10 +1,17 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+<<<<<<< Updated upstream
 import { useTheme } from '../hooks/useTheme';
 
 const NotificationsScreen = () => {
   const { theme } = useTheme();
+=======
+import { useTheme } from '../contexts/ThemeContext';
+
+const NotificationsScreen = () => {
+  const { colors } = useTheme();
+>>>>>>> Stashed changes
   
   const notifications = [
     {
@@ -31,8 +38,13 @@ const NotificationsScreen = () => {
       style={[
         styles.notificationItem,
         { 
+<<<<<<< Updated upstream
           backgroundColor: item.read ? theme.colors.card : theme.colors.surface,
           borderColor: theme.colors.border
+=======
+          backgroundColor: item.read ? colors.card : colors.surface,
+          borderColor: colors.border
+>>>>>>> Stashed changes
         }
       ]}
     >
@@ -40,6 +52,7 @@ const NotificationsScreen = () => {
         <Icon 
           name={item.type === 'like' ? 'heart' : 'comment'} 
           size={24} 
+<<<<<<< Updated upstream
           color={theme.colors.primary}
         />
       </View>
@@ -51,17 +64,38 @@ const NotificationsScreen = () => {
           {item.content}
         </Text>
         <Text style={[styles.time, { color: theme.colors.textSecondary }]}>
+=======
+          color={colors.primary}
+        />
+      </View>
+      <View style={styles.contentContainer}>
+        <Text style={[styles.userName, { color: colors.text }]}>
+          {item.user}
+        </Text>
+        <Text style={[styles.content, { color: colors.textSecondary }]}>
+          {item.content}
+        </Text>
+        <Text style={[styles.time, { color: colors.textSecondary }]}>
+>>>>>>> Stashed changes
           {item.time}
         </Text>
       </View>
       {!item.read && (
+<<<<<<< Updated upstream
         <View style={[styles.unreadDot, { backgroundColor: theme.colors.primary }]} />
+=======
+        <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />
+>>>>>>> Stashed changes
       )}
     </TouchableOpacity>
   );
 
   return (
+<<<<<<< Updated upstream
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+=======
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+>>>>>>> Stashed changes
       <FlatList
         data={notifications}
         renderItem={renderNotification}

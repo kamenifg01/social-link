@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useState, useContext } from "react";
 import { View, FlatList, StyleSheet, Text, TouchableOpacity } from "react-native";
 import PostCard from "../components/PostCard";
@@ -61,11 +62,71 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         onScroll={handleScroll}
         style={{ backgroundColor: isDarkMode ? '#1a1a1a' : '#fff' }}
+=======
+import React, { useEffect, useState } from "react";
+import { View, FlatList, StyleSheet, Text } from "react-native";
+import PostCard from "../components/PostCard";
+import { fetchPosts } from '../services/apiService';
+import { useTheme } from '@react-navigation/native';
+
+const HomeScreen = ({ navigation }) => {
+  const [posts, setPosts] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const { colors } = useTheme();
+
+  const loadPosts = async () => {
+    try {
+      const fetchedPosts = await fetchPosts();
+      setPosts(fetchedPosts);
+    } catch (error) {
+      console.error('Erreur chargement posts:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadPosts();
+    setRefreshing(false);
+  };
+
+  const handleProfilePress = (user) => {
+    navigation.navigate('Profile', { userId: user.id });
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <FlatList
+        data={posts}
+        renderItem={({ item }) => (
+          <PostCard 
+            post={item} 
+            navigation={navigation} 
+            onProfilePress={handleProfilePress}
+            isProfileOwner={false}
+            onUpdate={handleRefresh}
+          />
+        )}
+        keyExtractor={(item) => item.id.toString()}
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={[styles.emptyText, { color: colors.text }]}>
+              Aucune publication pour le moment
+            </Text>
+          </View>
+        }
+>>>>>>> Stashed changes
       />
     </View>
   );
 };
 
+<<<<<<< Updated upstream
 HomeScreen.propTypes = {
   navigation: PropTypes.object.isRequired,
 };
@@ -86,6 +147,22 @@ const styles = StyleSheet.create({
   },
   container: {
     // Styles spécifiques à HomeScreen
+=======
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    textAlign: 'center',
+    fontStyle: 'italic',
+>>>>>>> Stashed changes
   },
 });
 

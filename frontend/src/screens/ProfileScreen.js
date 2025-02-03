@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import React, { useEffect, useState, useContext } from 'react';
+=======
+import React, { useEffect, useState } from 'react';
+>>>>>>> Stashed changes
 import {
   View,
   Text,
@@ -15,16 +19,24 @@ import { fetchProfile, fetchUserPosts } from '../services/apiService';
 import PostCard from '../components/PostCard';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+<<<<<<< Updated upstream
 import { ThemeContext } from '../navigation/AppNavigator';
 import { useTheme } from '@react-navigation/native';
+=======
+import { useTheme } from '../contexts/ThemeContext';
+>>>>>>> Stashed changes
 
 const ProfileScreen = ({ route, navigation }) => {
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showConnectionsModal, setShowConnectionsModal] = useState(false);
+<<<<<<< Updated upstream
   const { isDarkMode } = useContext(ThemeContext);
   const { colors } = useTheme();
+=======
+  const { isDarkMode, colors } = useTheme();
+>>>>>>> Stashed changes
 
   useEffect(() => {
     loadProfile();
